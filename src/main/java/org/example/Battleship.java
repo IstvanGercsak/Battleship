@@ -40,26 +40,39 @@ public class Battleship {
         System.out.println();
         System.out.println("Enter the coordinates of the Aircraft Carrier (5 cells):");
         aircraftCarrier.position = scanner.nextLine().toUpperCase();
+        //aircraftCarrier.position = "J3 J7";
         putShipOnTheTable(aircraftCarrier, gameTable);
 
         System.out.println();
         System.out.println("Enter the coordinates of the Battleship (4 cells):");
         battleship.position = scanner.nextLine().toUpperCase();
+        //battleship.position = "C8 F8";
         putShipOnTheTable(battleship, gameTable);
 
         System.out.println("Enter the coordinates of the Submarine (3 cells):");
         submarine.position = scanner.nextLine().toUpperCase();
+        //submarine.position = "A1 C1";
         putShipOnTheTable(submarine, gameTable);
 
         System.out.println();
         System.out.println("Enter the coordinates of the Cruiser (3 cells):");
         cruiser.position = scanner.nextLine().toUpperCase();
+        //cruiser.position = "H1 H3";
         putShipOnTheTable(cruiser, gameTable);
 
         System.out.println();
         System.out.println("Enter the coordinates of the Destroyer (2 cells):");
         destroyer.position = scanner.nextLine().toUpperCase();
+        //destroyer.position = "B5 C5";
         putShipOnTheTable(destroyer, gameTable);
+
+        System.out.println("The game starts!");
+        printTable(gameTable);
+
+
+        System.out.println("Take a shot!");
+        String shot = scanner.nextLine().toUpperCase();
+        shot(shot, gameTable);
 
     }
 
@@ -158,6 +171,7 @@ public class Battleship {
                     gameTable.table[positionInArrayFirst][numberTwoS - 1].equals("O")
             ) {
                 tooClose = true;
+                break;
             }
         }
         for (int i = numberOneS; i <= numberTwoS; i++) {
@@ -169,11 +183,12 @@ public class Battleship {
                     gameTable.table[positionInArrayFirst][numberTwoS - 1].equals("O")
             ) {
                 tooClose = true;
+                break;
             }
         }
 
         if (tooClose) {
-            System.out.println("Error! You placed it too close to another one. Try againloop:");
+            System.out.println("Error! You placed it too close to another one. Try again:");
             ship.position = scanner.nextLine().toUpperCase();
             putShipOnTheTable(ship, gameTable);
         } else if (!beginningPointLetter.equals(endPointLetter) && numberOneS != numberTwoS) {
@@ -185,7 +200,7 @@ public class Battleship {
 
         } else {
 
-            //Utkozes
+            // Overlap
             if (gameTable.table[positionInArrayFirst][numberOneS].equals("O") || gameTable.table[positionInArraySecond][numberTwoS].equals("O")) {
 
                 System.out.println();
@@ -238,6 +253,40 @@ public class Battleship {
                     putShipOnTheTable(ship, gameTable);
                 }
             }
+        }
+    }
+
+    public static void shot(String shot, Table gameTable) {
+
+        Scanner scanner = new Scanner(System.in);
+        String shotLetter = shot.substring(0, 1);
+        String[] parts = shot.split(shotLetter);
+        int shotNumber = Integer.parseInt(parts[1]);
+        int positionShotLetter = 0;
+        String myString = "";
+
+        for (int i = 0; i < gameTable.table.length; i++) {
+            myString += gameTable.table[i][0];
+            if (gameTable.table[i][0].equals(shotLetter)) {
+                positionShotLetter = i;
+            }
+        }
+
+        if (!myString.contains(shotLetter) || shotNumber > gameTable.table.length - 2) {
+
+            System.out.println("Error! You entered the wrong coordinates! Try again:");
+            shot = scanner.nextLine().toUpperCase();
+            shot(shot, gameTable);
+
+        }
+        if (gameTable.table[positionShotLetter][shotNumber].equals("O")) {
+            gameTable.table[positionShotLetter][shotNumber] = "X";
+            printTable(gameTable);
+            System.out.println("You hit a ship!");
+        } else {
+            gameTable.table[positionShotLetter][shotNumber] = "M";
+            printTable(gameTable);
+            System.out.println("You missed!");
         }
     }
 }
