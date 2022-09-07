@@ -28,6 +28,7 @@ public class Battleship {
 
         Scanner scanner = new Scanner(System.in);
         Table gameTable = new Table();
+        Table gameFogTable = new Table();
         Ship aircraftCarrier = new Ship("Aircraft Carrier", 5);
         Ship battleship = new Ship("Battleship", 4);
         Ship submarine = new Ship("Submarine", 3);
@@ -40,39 +41,40 @@ public class Battleship {
         System.out.println();
         System.out.println("Enter the coordinates of the Aircraft Carrier (5 cells):");
         aircraftCarrier.position = scanner.nextLine().toUpperCase();
-        //aircraftCarrier.position = "J3 J7";
+        //aircraftCarrier.position = "F3 F7";
         putShipOnTheTable(aircraftCarrier, gameTable);
 
         System.out.println();
         System.out.println("Enter the coordinates of the Battleship (4 cells):");
         battleship.position = scanner.nextLine().toUpperCase();
-        //battleship.position = "C8 F8";
+        //battleship.position = "A1 D1";
         putShipOnTheTable(battleship, gameTable);
 
         System.out.println("Enter the coordinates of the Submarine (3 cells):");
         submarine.position = scanner.nextLine().toUpperCase();
-        //submarine.position = "A1 C1";
+        //submarine.position = "J10 J8";
         putShipOnTheTable(submarine, gameTable);
 
         System.out.println();
         System.out.println("Enter the coordinates of the Cruiser (3 cells):");
         cruiser.position = scanner.nextLine().toUpperCase();
-        //cruiser.position = "H1 H3";
+        //cruiser.position = "B9 D9";
         putShipOnTheTable(cruiser, gameTable);
 
         System.out.println();
         System.out.println("Enter the coordinates of the Destroyer (2 cells):");
         destroyer.position = scanner.nextLine().toUpperCase();
-        //destroyer.position = "B5 C5";
+        //destroyer.position = "I2 J2";
         putShipOnTheTable(destroyer, gameTable);
 
         System.out.println("The game starts!");
-        printTable(gameTable);
+        fillTable(gameFogTable);
+        printTable(gameFogTable);
 
 
         System.out.println("Take a shot!");
         String shot = scanner.nextLine().toUpperCase();
-        shot(shot, gameTable);
+        shot(shot, gameTable, gameFogTable);
 
     }
 
@@ -256,12 +258,19 @@ public class Battleship {
         }
     }
 
-    public static void shot(String shot, Table gameTable) {
+    public static void shot(String shot, Table gameTable, Table gameFogTable) {
 
         Scanner scanner = new Scanner(System.in);
         String shotLetter = shot.substring(0, 1);
         String[] parts = shot.split(shotLetter);
-        int shotNumber = Integer.parseInt(parts[1]);
+        int shotNumber = 0;
+        try {
+            shotNumber = Integer.parseInt(parts[1]);
+        } catch (Exception e) {
+            System.out.println("Take a shot!");
+            shot = scanner.nextLine().toUpperCase();
+            shot(shot, gameTable, gameFogTable);
+        }
         int positionShotLetter = 0;
         String myString = "";
 
@@ -276,17 +285,21 @@ public class Battleship {
 
             System.out.println("Error! You entered the wrong coordinates! Try again:");
             shot = scanner.nextLine().toUpperCase();
-            shot(shot, gameTable);
+            shot(shot, gameTable, gameFogTable);
 
         }
         if (gameTable.table[positionShotLetter][shotNumber].equals("O")) {
+            gameFogTable.table[positionShotLetter][shotNumber] = "X";
             gameTable.table[positionShotLetter][shotNumber] = "X";
-            printTable(gameTable);
+            printTable(gameFogTable);
             System.out.println("You hit a ship!");
-        } else {
-            gameTable.table[positionShotLetter][shotNumber] = "M";
             printTable(gameTable);
+        } else {
+            gameFogTable.table[positionShotLetter][shotNumber] = "M";
+            gameTable.table[positionShotLetter][shotNumber] = "M";
+            printTable(gameFogTable);
             System.out.println("You missed!");
+            printTable(gameTable);
         }
     }
 }
