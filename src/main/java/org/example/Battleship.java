@@ -7,6 +7,7 @@ public class Battleship {
     static class Table {
         int x_wide = 11;
         int y_height = 11;
+        // countShipX -> The amount of X on the two fields
         int countShipX = 17;
         String[][] table = new String[x_wide + 1][y_height + 1];
 
@@ -29,7 +30,11 @@ public class Battleship {
 
         Scanner scanner = new Scanner(System.in);
         Table gameTable = new Table();
+        Table gameTablePlayerTwo = new Table();
         Table gameFogTable = new Table();
+        Table gameFogTablePlayerTwo = new Table();
+        String shot = "";
+
         Ship aircraftCarrier = new Ship("Aircraft Carrier", 5);
         Ship battleship = new Ship("Battleship", 4);
         Ship submarine = new Ship("Submarine", 3);
@@ -37,6 +42,11 @@ public class Battleship {
         Ship destroyer = new Ship("Destroyer", 2);
 
         fillTable(gameTable);
+        fillTable(gameFogTable);
+        fillTable(gameTablePlayerTwo);
+        fillTable(gameFogTablePlayerTwo);
+
+        System.out.println("Player 1, place your ships on the game field");
         printTable(gameTable);
 
         System.out.println();
@@ -68,20 +78,68 @@ public class Battleship {
         //destroyer.position = "I2 J2";
         putShipOnTheTable(destroyer, gameTable);
 
-        System.out.println();
-        System.out.println("The game starts!");
-        fillTable(gameFogTable);
-        printTable(gameFogTable);
+        // hit enter
+        passToAnotherPlayer();
+        System.out.println("Player 2, place your ships to the game field");
+
+        printTable(gameTablePlayerTwo);
 
         System.out.println();
-        System.out.println("Take a shot!");
-        System.out.println();
-        String shot = scanner.nextLine().toUpperCase();
-        shot(shot, gameTable, gameFogTable);
+        System.out.println("Enter the coordinates of the Aircraft Carrier (5 cells):");
+        aircraftCarrier.position = scanner.nextLine().toUpperCase();
+        //aircraftCarrier.position = "F3 F7";
+        putShipOnTheTable(aircraftCarrier, gameTablePlayerTwo);
 
         System.out.println();
-        System.out.println("You sank the last ship. You won. Congratulations!");
+        System.out.println("Enter the coordinates of the Battleship (4 cells):");
+        battleship.position = scanner.nextLine().toUpperCase();
+        //battleship.position = "A1 D1";
+        putShipOnTheTable(battleship, gameTablePlayerTwo);
 
+        System.out.println();
+        System.out.println("Enter the coordinates of the Submarine (3 cells):");
+        submarine.position = scanner.nextLine().toUpperCase();
+        //submarine.position = "J10 J8";
+        putShipOnTheTable(submarine, gameTablePlayerTwo);
+
+        System.out.println();
+        System.out.println("Enter the coordinates of the Cruiser (3 cells):");
+        cruiser.position = scanner.nextLine().toUpperCase();
+        //cruiser.position = "B9 D9";
+        putShipOnTheTable(cruiser, gameTablePlayerTwo);
+
+        System.out.println();
+        System.out.println("Enter the coordinates of the Destroyer (2 cells):");
+        destroyer.position = scanner.nextLine().toUpperCase();
+        //destroyer.position = "I2 J2";
+        putShipOnTheTable(destroyer, gameTablePlayerTwo);
+
+        // hit enter
+        passToAnotherPlayer();
+
+        for (int i = 0; i < 34; i++) {
+
+            printTable(gameFogTablePlayerTwo);
+            System.out.print("---------------------");
+            printTable(gameTable);
+
+            System.out.println();
+            System.out.println("Player 1, it's your turn:");
+            System.out.println();
+            shot = scanner.nextLine().toUpperCase();
+            shot(shot, gameTablePlayerTwo, gameFogTablePlayerTwo, gameTablePlayerTwo);
+
+            printTable(gameFogTable);
+            System.out.print("---------------------");
+            printTable(gameTablePlayerTwo);
+
+            System.out.println();
+            System.out.println("Player 2, it's your turn:");
+            System.out.println();
+            shot = scanner.nextLine().toUpperCase();
+            shot(shot, gameTable, gameFogTable, gameTable);
+
+        }
     }
 
     public static void fillTable(Table gameTable) {
@@ -270,7 +328,7 @@ public class Battleship {
         }
     }
 
-    public static void shot(String shot, Table gameTable, Table gameFogTable) {
+    public static void shot(String shot, Table gameTable, Table gameFogTable, Table gameTableAgainst) {
 
         Scanner scanner = new Scanner(System.in);
         String shotLetter = shot.substring(0, 1);
@@ -282,7 +340,7 @@ public class Battleship {
         } catch (Exception e) {
             System.out.println("Take a shot!");
             shot = scanner.nextLine().toUpperCase();
-            shot(shot, gameTable, gameFogTable);
+            shot(shot, gameTable, gameFogTable, gameTableAgainst);
         }
 
         int positionShotLetter = 0;
@@ -297,77 +355,83 @@ public class Battleship {
 
         if (gameFogTable.table[positionShotLetter][shotNumber].equals("X")) {
 
-            printTable(gameFogTable);
             System.out.println();
-            System.out.println("You hit a ship! Try again:");
-            System.out.println();
-            shot = scanner.nextLine().toUpperCase();
-            shot(shot, gameTable, gameFogTable);
+            System.out.println("You hit a ship!");
+            passToAnotherPlayer();
 
         } else {
 
-            for (int i = 0; i < gameTable.countShipX; i++) {
+            if (!myString.contains(shotLetter) || shotNumber > gameTable.table.length - 2) {
 
-                if (!myString.contains(shotLetter) || shotNumber > gameTable.table.length - 2) {
 
-                    System.out.println();
-                    System.out.println("Error! You entered the wrong coordinates! Try again:");
-                    System.out.println();
-                    shot = scanner.nextLine().toUpperCase();
-                    shot(shot, gameTable, gameFogTable);
+                System.out.println();
+                System.out.println("Error! You entered the wrong coordinates! Try again:");
+                System.out.println();
+                shot = scanner.nextLine().toUpperCase();
+                shot(shot, gameTable, gameFogTable, gameTableAgainst);
 
-                }
-                if (gameTable.table[positionShotLetter][shotNumber].equals("O") || gameTable.table[positionShotLetter][shotNumber].equals("X")) {
+            }
+            if (gameTable.table[positionShotLetter][shotNumber].equals("O") || gameTable.table[positionShotLetter][shotNumber].equals("X")) {
 
-                    gameFogTable.table[positionShotLetter][shotNumber] = "X";
-                    gameTable.table[positionShotLetter][shotNumber] = "X";
-                    gameTable.countShipX--;
+                gameFogTable.table[positionShotLetter][shotNumber] = "X";
+                gameTableAgainst.table[positionShotLetter][shotNumber] = "X";
+                gameTable.countShipX--;
 
-                    if (
-                            !gameTable.table[positionShotLetter - 1][shotNumber].equals("O") &&
-                                    !gameTable.table[positionShotLetter + 1][shotNumber].equals("O") &&
-                                    !gameTable.table[positionShotLetter][shotNumber - 1].equals("O") &&
-                                    !gameTable.table[positionShotLetter][shotNumber + 1].equals("O")
+                if (
+                        !gameTable.table[positionShotLetter - 1][shotNumber].equals("O") &&
+                                !gameTable.table[positionShotLetter + 1][shotNumber].equals("O") &&
+                                !gameTable.table[positionShotLetter][shotNumber - 1].equals("O") &&
+                                !gameTable.table[positionShotLetter][shotNumber + 1].equals("O")
 
-                    ) {
+                ) {
 
-                        if (gameTable.countShipX == 0) {
-
-                            printTable(gameFogTable);
-                            break;
-
-                        }
+                    if (gameTable.countShipX == 0) {
 
                         printTable(gameFogTable);
-                        System.out.println();
-                        System.out.println("You sank a ship! Specify a new target:");
-                        System.out.println();
-                        shot = scanner.nextLine().toUpperCase();
-                        shot(shot, gameTable, gameFogTable);
-
-                    } else {
-
-                        printTable(gameFogTable);
-                        System.out.println();
-                        System.out.println("You hit a ship! Try again:");
-                        System.out.println();
-                        shot = scanner.nextLine().toUpperCase();
-                        shot(shot, gameTable, gameFogTable);
+                        System.out.println("You sank the last ship. You won. Congratulations!");
 
                     }
+
+                    System.out.println();
+                    System.out.println("You sank a ship!");
+                    passToAnotherPlayer();
+
                 } else {
 
-                    gameFogTable.table[positionShotLetter][shotNumber] = "M";
-                    gameTable.table[positionShotLetter][shotNumber] = "M";
-                    printTable(gameFogTable);
                     System.out.println();
-                    System.out.println("You missed! Try again:");
-                    System.out.println();
-                    shot = scanner.nextLine().toUpperCase();
-                    shot(shot, gameTable, gameFogTable);
+                    System.out.println("You hit a ship!");
+                    passToAnotherPlayer();
 
                 }
+
+            } else {
+
+                gameFogTable.table[positionShotLetter][shotNumber] = "M";
+                gameTableAgainst.table[positionShotLetter][shotNumber] = "M";
+
+                System.out.println();
+                System.out.println("You missed!");
+                passToAnotherPlayer();
+
             }
         }
     }
+
+    public static void passToAnotherPlayer() {
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Press Enter and pass the move to another player\n");
+
+        scanner.nextLine();
+
+        clrscr();
+
+    }
+
+    public static void clrscr() {
+        for (int i = 0; i < 30; i++)
+            System.out.print("\n");
+    }
 }
+
